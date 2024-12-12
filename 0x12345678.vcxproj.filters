@@ -14,6 +14,9 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="src\parser_base.h">
+      <Filter>Header files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\essence_block.h">
@@ -44,6 +47,9 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="src\udp_reader.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\render_parser.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

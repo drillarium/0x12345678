@@ -9,19 +9,20 @@
 #include <thread>
 #include <array>
 #include <vector>
-#include <nlohmann/json.hpp>
 #include "essence_block.h"
 #include "smt_producer.h"
 #include "base64_simple.h"
+#include "parser_base.h"
 
 #define MAX_AV_PACKET_SIZE 1024 * 1024 * 4
 
 // UDP reader
 class UDPReader {
 public:
-  UDPReader(const char *_server, int _port)
+  UDPReader(ParserBase *_parser, const char *_server, int _port)
   :server_(_server)
   ,port_(_port)
+  ,parser_(_parser)
   {
   }
 
@@ -107,7 +108,7 @@ protected:
             // Sync word found, process the block         
             if(accumulatedData_.size() >= sizeof(EssenceBlock)) {
               EssenceBlock *block = reinterpret_cast<EssenceBlock *>(accumulatedData_.data());
-              processData(block);
+              parser_->parse(block);
               accumulatedData_.erase(accumulatedData_.begin(), accumulatedData_.end() - 4);
             }
           }
@@ -123,44 +124,6 @@ protected:
     }
   }
 
-  void processData(EssenceBlock *block) {
-    // essence data
-    if(block->essence_type == EssenceType::ESSENCE_TYPE_ED) {
-
-    }
-    // NULL packet
-    else if(block->essence_type == EssenceType::ESSENCE_TYPE_NULL) {
-      // NOOP
-    }
-    // SMT table (Stream manipulation table)
-    else if(block->essence_type == EssenceType::ESSENCE_TYPE_SMT) {
-      const uint8_t* payload = (const uint8_t *) (block + 1);
-      std::string receivedData((const char *) payload, block->payload_size);
-      nlohmann::json SMTJson = nlohmann::json::parse(receivedData);
-      
-      // Output the reconstructed JSON
-      // std::cout << "Reconstructed JSON:\n" << SMTJson.dump(4) << std::endl;   
-
-      for(int i = 0; SMTJson["actions"].size(); i++) {
-        std::string actionType = SMTJson["actions"][i]["action"];
-        if(actionType == ACTION_ADD_IMAGE) {
-          std::string imageType = SMTJson["actions"][i]["data_type"];
-          std::string base64Image = SMTJson["actions"][i]["data"];
-          std::string image = base64_decode(base64Image);
-        }
-      }
-    }
-    // Essence Announcement
-    else if(block->essence_type == EssenceType::ESSENCE_TYPE_EA) {
-      const uint8_t* payload = (const uint8_t *) (block + 1);
-      std::string receivedData((const char *) payload, block->payload_size);
-      nlohmann::json EAJson = nlohmann::json::parse(receivedData);
-
-      // Output the reconstructed JSON
-      // std::cout << "Reconstructed JSON:\n" << EAJson.dump(4) << std::endl;
-    }
-  }
-
 protected:
   std::string server_;
   int port_ = 0;
@@ -172,4 +135,5 @@ protected:
   std::thread workerThread_;
   std::atomic<bool> stopFlag_ = false;
   std::vector<uint8_t> accumulatedData_;
+  ParserBase *parser_ = nullptr;
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string>
 
 // Define the sync value (magic number)
 // This should be a unique constant that will be easily recognizable by the receiver
@@ -32,7 +33,7 @@ struct EssenceBlock {
 #pragma pack(pop)
 
 // Alloc essence block
-EssenceBlock* createEssenceBlock(int _payloadSize) {
+__inline EssenceBlock* createEssenceBlock(int _payloadSize) {
   EssenceBlock* essenceBlock = (EssenceBlock*) (new uint8_t[_payloadSize + sizeof(EssenceBlock)]);
   essenceBlock->sync = SYNC_MAGIC_NUMBER;
   essenceBlock->size = sizeof(EssenceBlock);
@@ -42,13 +43,13 @@ EssenceBlock* createEssenceBlock(int _payloadSize) {
   return essenceBlock;
 }
 
-EssenceBlock * cloneEssenceBlock(EssenceBlock *_block) {
+__inline EssenceBlock * cloneEssenceBlock(EssenceBlock *_block) {
   EssenceBlock *block = createEssenceBlock(_block->payload_size);
   memcpy(block, _block, _block->size + _block->payload_size);
   return block;
 }
 
-void destroyEssenceBlock(EssenceBlock **_block) {
+__inline void destroyEssenceBlock(EssenceBlock **_block) {
   if(*_block) {
     delete[] * _block;
   }

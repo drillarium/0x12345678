@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=C:\Projects\avio\0x12345678\deps\ffmpeg-6.1.1\bin;%PATH%
+    <LocalDebuggerEnvironment>PATH=C:\Projects\avio\0x12345678\deps\SDL2_image-2.8.2\lib\x64;C:\Projects\avio\0x12345678\deps\SDL2-2.30.10\lib\x64;C:\Projects\avio\0x12345678\deps\ffmpeg-6.1.1\bin;%PATH%
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>"https://cdn.flowplayer.com/a30bd6bc-f98b-47bc-abf5-97633d4faea0/hls/de3f6ca7-2db3-4689-8160-0f574a5996ad/playlist.m3u8" 239.255.0.1 12345 8000000</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerEnvironment>PATH=C:\Projects\avio\0x12345678\deps\ffmpeg-6.1.1\bin;%PATH%
+    <LocalDebuggerEnvironment>PATH=C:\Projects\avio\0x12345678\deps\SDL2_image-2.8.2\lib\x64;C:\Projects\avio\0x12345678\deps\SDL2-2.30.10\lib\x64;C:\Projects\avio\0x12345678\deps\ffmpeg-6.1.1\bin;%PATH%
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>"https://cdn.flowplayer.com/a30bd6bc-f98b-47bc-abf5-97633d4faea0/hls/de3f6ca7-2db3-4689-8160-0f574a5996ad/playlist.m3u8" 239.255.0.1 12345 8000000</LocalDebuggerCommandArguments>

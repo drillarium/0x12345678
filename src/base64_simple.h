@@ -44,7 +44,7 @@ std::string base64_decode(const std::string& encoded) {
       return decoded;
     }
     if(c == '=') break;
-    val = (val << 6) + base64_chars.find(c);
+    val = (val << 6) + (int) base64_chars.find(c);
     valb += 6;
     if(valb >= 0) {
       decoded.push_back((val >> valb) & 0xFF);
