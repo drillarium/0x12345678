@@ -16,6 +16,7 @@
 #include "udp_writer.h"
 #include "muxer_consumer.h"
 #include "smt_producer.h"
+#include "udp_reader.h"
 
 // Initialize sockets (Windows specific)
 #ifdef _WIN32
@@ -54,11 +55,14 @@ int main(int argc, char *argv[]) {
   MuxerParams muxerParams;
   std::thread consumerThread(muxer_consumer, std::ref(muxerParams), std::ref(queue), std::ref(udpWriter));
   std::thread dummySMTThread(smt_producer, std::ref(queue));
+  UDPReader reader(argv[2], std::stoi(argv[3]));
+  reader.open();
 
   producerThread0.join();
   producerThread1.join();
   consumerThread.join();
   dummySMTThread.join();
+  reader.close();
 
 #ifdef _WIN32
   cleanup_socket_library(); // Cleanup for Windows

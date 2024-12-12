@@ -40,7 +40,10 @@
     <ClInclude Include="src\smt_producer.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="src\base64_encode.h">
+    <ClInclude Include="src\base64_simple.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\udp_reader.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

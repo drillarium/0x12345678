@@ -4,7 +4,7 @@
 #include "queue_thread_safe.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
-#include "base64_encode.h"
+#include "base64_simple.h"
 
 #define MAX_MANIPULATION_TABLE_PAYLOAD_SIZE 1024 * 1024
 
@@ -69,6 +69,7 @@ void smt_producer(ThreadSafeQueue<EssenceBlock*>& _queue) {
         action_json["id"] = actionId;
         action_json["timestamp"] = 0; // ASAP
         action_json["data"] = base64_image;
+        action_json["data_type"] = "image/jpeg";
         action_json["x_percentage"] = 10.0;
         action_json["y_percentage"] = 20.0;
         action_json["width_percentage"] = 15.0;

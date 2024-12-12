@@ -12,8 +12,8 @@
 class UDPWriter : public WriterBase {
 public:
   UDPWriter(const char *_server, int _port)
-  :server_(_server),
-  port_(_port)
+  :server_(_server)
+  ,port_(_port)
   {
   }
 
@@ -96,9 +96,9 @@ protected:
   std::string server_;
   int port_ = 0;
 #ifdef _WIN32
-  SOCKET sockfd_;
+  SOCKET sockfd_ = 0;
 #else
-  int sockfd_;
+  int sockfd_ = 0;
 #endif
-  struct sockaddr_in serverAddr_;
+  struct sockaddr_in serverAddr_ = {};
 };

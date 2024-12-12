@@ -136,13 +136,14 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\base64_encode.h" />
+    <ClInclude Include="src\base64_simple.h" />
     <ClInclude Include="src\essence_block.h" />
     <ClInclude Include="src\ffmpeg_producer.h" />
     <ClInclude Include="src\muxer_consumer.h" />
     <ClInclude Include="src\muxer_timestamp.h" />
     <ClInclude Include="src\queue_thread_safe.h" />
     <ClInclude Include="src\smt_producer.h" />
+    <ClInclude Include="src\udp_reader.h" />
     <ClInclude Include="src\udp_writer.h" />
     <ClInclude Include="src\writer_base.h" />
   </ItemGroup>
