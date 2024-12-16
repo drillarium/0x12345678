@@ -1,7 +1,4 @@
 # 0x12345678
-Stream AV Content using SMT (Stream Manipulation Table)
-
-# 0x12345678
 
 ## Overview
 Traditionally, actions like adding a corporate logo to a transport stream involves decoding the stream, overlaying the logo, and re-encoding the stream. While functional, this approach has several drawbacks, including loss of video quality, higher computational requirements, and increased latency.
