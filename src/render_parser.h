@@ -126,6 +126,7 @@ public:
       for(int i = 0; i < SMTJson["actions"].size(); i++) {
         std::string actionType = SMTJson["actions"][i]["action"];
         uint64_t id = SMTJson["actions"][i]["id"];
+        // add image from data
         if(actionType == ACTION_ADD_IMAGE) {
           std::string imageType = SMTJson["actions"][i]["data_type"];
           std::string base64Image = SMTJson["actions"][i]["data"];
@@ -133,9 +134,10 @@ public:
           if(imageTexture_) {
             SDL_DestroyTexture(imageTexture_);
           }
-          imageTexture_ = loadJPEGFromMemory(image, renderer_);
+          imageTexture_ = loadFromMemory(image, renderer_);
           actionId_ = id;
         }
+        // remove image
         else if(actionType == ACTION_REMOVE_IMAGE) {
           if(id == actionId_) {
             if(imageTexture_) {
@@ -186,7 +188,7 @@ public:
 
   protected:
     // Load JPEG from memory into an SDL_Texture
-    SDL_Texture* loadJPEGFromMemory(const std::string &jpegData, SDL_Renderer *renderer) {
+    SDL_Texture* loadFromMemory(const std::string &jpegData, SDL_Renderer *renderer) {
       SDL_RWops* rw = SDL_RWFromConstMem(jpegData.data(), (int) jpegData.size());
       if(!rw) {
         std::cerr << "SDL_RWFromConstMem Error: " << SDL_GetError() << std::endl;
