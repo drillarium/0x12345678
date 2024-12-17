@@ -25,6 +25,13 @@ public:
       return false;
     }
 
+    // Set socket to non-blocking mode
+    u_long mode = 1;  // 1 to enable non-blocking mode, 0 to disable
+    if(ioctlsocket(sockfd_, FIONBIO, &mode) != 0) {
+      std::cerr << "Failed to set non-blocking mode: " << WSAGetLastError() << std::endl;
+      return false;
+    }
+
     // Enable SO_REUSEADDR to allow multiple processes to use the same port
     BOOL reuse = TRUE;
     if(setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse)) == SOCKET_ERROR) {
@@ -69,6 +76,7 @@ public:
   int write(const unsigned char *_packet, int _packetSize) {
     const uint8_t* message = _packet;
     size_t bytesSent = 0;
+    int numPackets = 0;
 
     while(bytesSent < _packetSize) {
       size_t remaining = _packetSize - bytesSent;
@@ -77,6 +85,7 @@ public:
       // Send the message
       int sentBytes = sendto(sockfd_, (const char*) message + bytesSent, (int) chunkSize, 0, (struct sockaddr*) &serverAddr_, sizeof(serverAddr_));
       if(sentBytes == SOCKET_ERROR) {
+        // never returns EWOULDBLOCK after setup socket to non-nlocking. I'm forcing to send huge blocks
         if(errno == EAGAIN || errno == EWOULDBLOCK) {
           std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Wait briefly and retry
           continue;
@@ -87,6 +96,12 @@ public:
         }
       }
       bytesSent += sentBytes;
+
+      // Problems sending PNG into SMT. Tests sleeping because EWOULDBLOCK never is returned case send buffer is full
+      numPackets++;
+      if(numPackets % 50 == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
     }
 
     return (int) bytesSent;

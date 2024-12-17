@@ -56,7 +56,7 @@ void smt_producer(ThreadSafeQueue<EssenceBlock*>& _queue) {
 
       if(drawImage) {
         // Path to the image
-        std::string image_path = "example_image.jpg";
+        std::string image_path = actionId%2==0? "example_image.jpg" : "example_image.png";
 
         // Read binary image data
         std::vector<uint8_t> image_data = read_binary_file(image_path);
@@ -69,7 +69,7 @@ void smt_producer(ThreadSafeQueue<EssenceBlock*>& _queue) {
         action_json["id"] = actionId;
         action_json["timestamp"] = 0; // ASAP
         action_json["data"] = base64_image;
-        action_json["data_type"] = "image/jpeg";
+        action_json["data_type"] = actionId%2==0? "image/jpeg" : "image/png";
         action_json["x_percentage"] = 10.0;
         action_json["y_percentage"] = 20.0;
         action_json["width_percentage"] = 15.0;

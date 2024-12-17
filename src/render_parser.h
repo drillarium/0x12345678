@@ -118,34 +118,40 @@ public:
     else if(_block->essence_type == EssenceType::ESSENCE_TYPE_SMT) {
       const uint8_t* payload = (const uint8_t*)(_block + 1);
       std::string receivedData((const char*)payload, _block->payload_size);
-      nlohmann::json SMTJson = nlohmann::json::parse(receivedData);
+      try {
+        nlohmann::json SMTJson = nlohmann::json::parse(receivedData);
 
-      // Output the reconstructed JSON
-      std::cout << "Reconstructed JSON:\n" << SMTJson.dump(4) << std::endl;   
+        // Output the reconstructed JSON
+        std::cout << "Reconstructed JSON:\n" << SMTJson.dump(4) << std::endl;   
 
-      for(int i = 0; i < SMTJson["actions"].size(); i++) {
-        std::string actionType = SMTJson["actions"][i]["action"];
-        uint64_t id = SMTJson["actions"][i]["id"];
-        // add image from data
-        if(actionType == ACTION_ADD_IMAGE) {
-          std::string imageType = SMTJson["actions"][i]["data_type"];
-          std::string base64Image = SMTJson["actions"][i]["data"];
-          std::string image = base64_decode(base64Image);
-          if(imageTexture_) {
-            SDL_DestroyTexture(imageTexture_);
-          }
-          imageTexture_ = loadFromMemory(image, renderer_);
-          actionId_ = id;
-        }
-        // remove image
-        else if(actionType == ACTION_REMOVE_IMAGE) {
-          if(id == actionId_) {
+        for(int i = 0; i < SMTJson["actions"].size(); i++) {
+          std::string actionType = SMTJson["actions"][i]["action"];
+          uint64_t id = SMTJson["actions"][i]["id"];
+          // add image from data
+          if(actionType == ACTION_ADD_IMAGE) {
+            std::string imageType = SMTJson["actions"][i]["data_type"];
+            std::string base64Image = SMTJson["actions"][i]["data"];
+            std::string image = base64_decode(base64Image);
             if(imageTexture_) {
               SDL_DestroyTexture(imageTexture_);
             }
-            imageTexture_ = nullptr;
+            imageTexture_ = loadFromMemory(image, renderer_);
+            actionId_ = id;
+          }
+          // remove image
+          else if(actionType == ACTION_REMOVE_IMAGE) {
+            if(id == actionId_) {
+              if(imageTexture_) {
+                SDL_DestroyTexture(imageTexture_);
+              }
+              imageTexture_ = nullptr;
+            }
           }
         }
+      }
+      catch(const nlohmann::json::parse_error &_e) {
+        std::cerr << "JSON parsing error: " << _e.what() << std::endl;
+        std::cerr << "Error location: byte " << _e.byte << std::endl;
       }
     }
     // Essence Announcement
@@ -155,30 +161,36 @@ public:
         EABlock_ = cloneEssenceBlock(_block);
         const uint8_t* payload = (const uint8_t *) (EABlock_ + 1);
         std::string receivedData((const char *) payload, EABlock_->payload_size);
-        EAPayload_ = nlohmann::json::parse(receivedData);
-        // Output the reconstructed JSON
-        std::cout << "Reconstructed JSON:\n" << EAPayload_.dump(4) << std::endl;
-        programIndex_ = EAPayload_["program_index"];
-        for(int i = 0; i < EAPayload_["streams"].size(); i++) {
-          std::string type = EAPayload_["streams"][i]["type"];
-          if( (videoStreamIndex_ < 0) && (type == "video") ) {
-            videoStreamIndex_ = EAPayload_["streams"][i]["index"];
+        try {
+          EAPayload_ = nlohmann::json::parse(receivedData);
+          // Output the reconstructed JSON
+          std::cout << "Reconstructed JSON:\n" << EAPayload_.dump(4) << std::endl;
+          programIndex_ = EAPayload_["program_index"];
+          for(int i = 0; i < EAPayload_["streams"].size(); i++) {
+            std::string type = EAPayload_["streams"][i]["type"];
+            if( (videoStreamIndex_ < 0) && (type == "video") ) {
+              videoStreamIndex_ = EAPayload_["streams"][i]["index"];
 
-            // open decoder
-            std::string codecName = EAPayload_["streams"][i]["codec"];
-            const AVCodec *codec = avcodec_find_decoder_by_name(codecName.c_str());
-            if(codec) {   
-              videoCodecCtx_ = avcodec_alloc_context3(codec);
-              if(videoCodecCtx_) {
-                if(avcodec_open2(videoCodecCtx_, codec, nullptr) < 0) {
-                  avcodec_free_context(&videoCodecCtx_);
-                }                              
+              // open decoder
+              std::string codecName = EAPayload_["streams"][i]["codec"];
+              const AVCodec *codec = avcodec_find_decoder_by_name(codecName.c_str());
+              if(codec) {   
+                videoCodecCtx_ = avcodec_alloc_context3(codec);
+                if(videoCodecCtx_) {
+                  if(avcodec_open2(videoCodecCtx_, codec, nullptr) < 0) {
+                    avcodec_free_context(&videoCodecCtx_);
+                  }                              
+                }
               }
             }
+            else if((audioStreamIndex_ < 0) && (type == "audio")) {
+              audioStreamIndex_ = EAPayload_["streams"][i]["index"];
+            }
           }
-          else if((audioStreamIndex_ < 0) && (type == "audio")) {
-            audioStreamIndex_ = EAPayload_["streams"][i]["index"];
-          }
+        }
+        catch(const nlohmann::json::parse_error& _e) {
+          std::cerr << "JSON parsing error: " << _e.what() << std::endl;
+          std::cerr << "Error location: byte " << _e.byte << std::endl;
         }
       }
     }
